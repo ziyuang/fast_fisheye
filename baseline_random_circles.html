@@ -9,7 +9,7 @@
   	}
   </style>
   <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <script src="d3-plugins/fisheye/fisheye.js" charset="utf-8"></script>
+  <script type="text/javascript" src="fast_fisheye.js"></script>
 </head>
 <body>
 <div id="container">
@@ -66,6 +66,7 @@ var fisheye = d3.fisheye.circular()
   .radius(200)
   .distortion(2);
 
+// the usage will be the same if not using the fast version
 svg.on("mousemove", function() {
 	fisheye.focus(d3.mouse(this));
   circles.each(function(d) { d.fisheye = fisheye(d); })

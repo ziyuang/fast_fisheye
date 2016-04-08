@@ -74,16 +74,9 @@ var applyDistortion = function(circleIdx, distortion) {
 	circle.attr('r', distortion.z * rArray[circleIdx]);
 };
 
-var removeDistortion = function(circleIdx) {
-	var circle = d3.select(circles[0][circleIdx]);
-	circle.attr('cx', circleArray[circleIdx].x);
-	circle.attr('cy', circleArray[circleIdx].y);
-	circle.attr('r', rArray[circleIdx])
-}
-
 svg.on("mousemove", function() {
 	fisheye.focus(d3.mouse(this));
-	fisheye(applyDistortion, removeDistortion);
+	fisheye(applyDistortion);
 });
 
 </script>

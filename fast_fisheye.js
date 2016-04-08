@@ -15,7 +15,7 @@
           y = function(p) {return p.y;},
           fastFisheye;
 
-      function fisheye(_, resetFunc) {
+      function fisheye(_) {
         if (fastFisheye === undefined) {
           var d = _;
           var dx = d.x - focus.x,
@@ -27,17 +27,10 @@
         }
         else {
           var distortFunc = _;
-          var result = fastFisheye.distort(focus);
-          var toDistort = result.toDistort;
-          var toReset = result.toReset;
+          var toDistort = fastFisheye.distort(focus);
           for (var i = 0; i < toDistort.size(); i++) {
             var affected = toDistort.get(i);
-            // console.log(affected);
             distortFunc(affected.index, affected.distortion);
-          }
-          for (var i = 0; i < toReset.size(); i++) {
-            var idx = toReset.get(i);
-            resetFunc(idx);
           }
         }
       }

@@ -23,12 +23,6 @@ struct FisheyeIndexDistortionPair {
 	FisheyeDistortion distortion;
 };
 
-struct FisheyeResult
-{
-	std::vector<FisheyeIndexDistortionPair> toDistort;
-	std::vector<size_t> toReset;
-};
-
 struct PointCloud
 {
 	std::vector<Point> pts;
@@ -93,7 +87,6 @@ private:
 			distorted.y = focus.y + dy * k;
 			distorted.z = std::fmin(k, 10);
 		}
-		// std::cout << "distortion: (" << distorted.x << ", " << distorted.y << ", " << distorted.z << ")" << std::endl;
 		return distorted;
 	}
 
@@ -115,18 +108,13 @@ public:
 			_tree.buildIndex();
 		}
 
-	FisheyeResult distort(const Point& focus) {
+	std::vector<FisheyeIndexDistortionPair> distort(const Point& focus) {
 		// std::cout << "focus = (" << focus.x << ", " << focus.y << ")" << std::endl;
 		double cfocus[2] = {focus.x, focus.y};
 		std::vector<std::pair<size_t, double> > kdtreeMatches;
-		std::vector<std::pair<size_t, double> > kdtreeExtendedMatches;
 		double factorSqrd = 3;
 
-		size_t nMatches = _tree.radiusSearch(&cfocus[0], _radius*_radius, kdtreeMatches, nanoflann::SearchParams());
-		size_t nExtendedMatches = _tree.radiusSearch(&cfocus[0], factorSqrd*_radius*_radius, kdtreeExtendedMatches, nanoflann::SearchParams());
-
-		std::set<size_t> kdtreeMatchIndices;
-		std::vector<size_t> toReset;
+		size_t nMatches = _tree.radiusSearch(&cfocus[0], factorSqrd * _radius*_radius, kdtreeMatches, nanoflann::SearchParams());
 
 		std::vector<FisheyeIndexDistortionPair> toDistort(nMatches);
 		// std::cout << "Found " << nMatches << " neighbors" << std::endl;
@@ -136,21 +124,9 @@ public:
 			toDistort_i.distortion = distortPoint(_pointCloud.pts[toDistort_i.index], focus);
 			// std::cout << "distortion: (" << toDistort_i.distortion.x << ", " << toDistort_i.distortion.y << ", " << toDistort_i.distortion.z << ")" << std::endl;
 			toDistort[i] = toDistort_i;
-			kdtreeMatchIndices.insert(toDistort_i.index);
 		}
 
-		for (size_t i = 0; i < nExtendedMatches; i++) {
-			size_t idx = kdtreeExtendedMatches[i].first;
-			if (kdtreeMatchIndices.find(idx) == kdtreeMatchIndices.end()) {
-				toReset.push_back(idx);
-			}
-		}
-
-		FisheyeResult result;
-		result.toDistort = toDistort;
-		result.toReset = toReset;
-
-		return result;
+		return toDistort;
 	}
 
 };
@@ -174,10 +150,6 @@ EMSCRIPTEN_BINDINGS(FastFisheye) {
 	register_vector<FisheyeIndexDistortionPair>("FisheyeIndexDistortionPairVector");
 
 	register_vector<size_t>("Indices");
-
-	value_object<FisheyeResult>("FisheyeResult")
-	.field("toDistort", &FisheyeResult::toDistort)
-	.field("toReset", &FisheyeResult::toReset);
 
 	class_<Fisheye>("FastFisheye")
 	.constructor<const std::vector<Point>&, double, double, double, size_t>()
