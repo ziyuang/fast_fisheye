@@ -76,8 +76,7 @@ var applyDistortion = function(circleIdx, distortion) {
 };
 
 svg.on("mousemove", function() {
-	fisheye.focus(d3.mouse(this));
-	fisheye(applyDistortion);
+	fisheye.fast_distort_at(d3.mouse(this), applyDistortion);
 });
 
 </script>

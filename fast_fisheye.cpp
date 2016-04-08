@@ -108,14 +108,12 @@ public:
 			_tree.buildIndex();
 		}
 
-	std::vector<FisheyeIndexDistortionPair> distort(const Point& focus) {
+	std::vector<FisheyeIndexDistortionPair> distort(const Point& focus, double actual_radius) {
 		// std::cout << "focus = (" << focus.x << ", " << focus.y << ")" << std::endl;
 		double cfocus[2] = {focus.x, focus.y};
 		std::vector<std::pair<size_t, double> > kdtreeMatches;
-		double factorSqrd = 3;
 
-		size_t nMatches = _tree.radiusSearch(&cfocus[0], factorSqrd * _radius*_radius, kdtreeMatches, nanoflann::SearchParams());
-
+		size_t nMatches = _tree.radiusSearch(&cfocus[0], actual_radius * actual_radius, kdtreeMatches, nanoflann::SearchParams());
 		std::vector<FisheyeIndexDistortionPair> toDistort(nMatches);
 		// std::cout << "Found " << nMatches << " neighbors" << std::endl;
 		for (size_t i = 0; i < nMatches; i++) {

@@ -12,5 +12,4 @@ Check `fast_random_circles.html`. Cartesian Distortion is untouched and not sped
 
 ## Issues
 1. Not fast enough. I guess some NN search techniques for moving object (= current cursor position) should help. Left as future works.
-2. Moving your cursor too fast may have some svg elements remain distorted, since it doesn't process every point in the `mouseover` event.
-3. Strangly it is much slower under Firefox.
+2. Particularly (and strangly) it is much slower in Firefox.

@@ -13,35 +13,18 @@
           focus = {'x': 0, 'y': 0},
           x = function(p) {return p.x;},
           y = function(p) {return p.y;},
+          nPts,
           fastFisheye;
 
-      function fisheye(_) {
-        if (fastFisheye === undefined) {
-          var d = _;
-          var dx = d.x - focus.x,
-              dy = d.y - focus.y,
-              dd = Math.sqrt(dx * dx + dy * dy);
-          if (!dd || dd >= radius) return {x: d.x, y: d.y, z: dd >= radius ? 1 : 10};
-          var k = k0 * (1 - Math.exp(-dd * k1)) / dd * .75 + .25;
-          return {x: focus.x + dx * k, y: focus.y + dy * k, z: Math.min(k, 10)};
-        }
-        else {
-          var distortFunc = _;
-          var toDistort = fastFisheye.distort(focus);
-          if (async !== undefined) {
-            async.each(d3.range(toDistort.size()), function(i) {
-              var affected = toDistort.get(i);
-              distortFunc(affected.index, affected.distortion);
-            });
-          }
-          else {
-            for (var i = 0; i < toDistort.size(); i++) {
-              var affected = toDistort.get(i);
-              distortFunc(affected.index, affected.distortion);
-            }
-          }
-        }
+      function fisheye(d) {
+        var dx = d.x - focus.x,
+            dy = d.y - focus.y,
+            dd = Math.sqrt(dx * dx + dy * dy);
+        if (!dd || dd >= radius) return {x: d.x, y: d.y, z: dd >= radius ? 1 : 10};
+        var k = k0 * (1 - Math.exp(-dd * k1)) / dd * .75 + .25;
+        return {x: focus.x + dx * k, y: focus.y + dy * k, z: Math.min(k, 10)};
       }
+
 
       function rescale() {
         k0 = Math.exp(distortion);
@@ -68,6 +51,28 @@
         return fisheye;
       };
 
+      fisheye.fast_distort_at = function(currentFocus, distortFunc) {
+        currentFocus = {'x': currentFocus[0], 'y': currentFocus[1]};
+        var dx = focus.x - currentFocus.x;
+        var dy = focus.y - currentFocus.y;
+        var actual_radius = Math.sqrt(dx*dx+dy*dy) + radius;
+        var toDistort = fastFisheye.distort(currentFocus, actual_radius);
+
+        if (typeof async !== 'undefined') {
+          async.each(d3.range(toDistort.size()), function(i) {
+            var affected = toDistort.get(i);
+            distortFunc(affected.index, affected.distortion);
+          })
+        }
+        else {
+          for (var i = 0; i < toDistort.size(); i++) {
+            var affected = toDistort.get(i);
+            distortFunc(affected.index, affected.distortion);
+          }
+        }
+        focus = currentFocus;
+      };
+
       fisheye.x = function(xAccessor) {
         if (!arguments.length) return x;
         x = xAccessor;
@@ -87,10 +92,10 @@
       }
 
       fisheye.prepare = function(pts) {
-        if (Module !== undefined) {
+        if (typeof Module !== 'undefined') {
           var pointVec = new Module.PointVec();
-          var n = pts.length;
-          for (var i = 0; i < n; i++) {
+          nPts = pts.length;
+          for (var i = 0; i < nPts; i++) {
             pointVec.push_back({'x': x(pts[i]), 'y': y(pts[i])});
           }
           fastFisheye = new Module.FastFisheye(pointVec, radius, k0, k1, leaf_max_size);
