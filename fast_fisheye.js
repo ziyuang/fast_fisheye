@@ -50,7 +50,7 @@
         return fisheye;
       };
 
-      fisheye.fast_distort_at = function(currentFocus, distortFunc) {
+      fisheye.fast_distort_at = function(currentFocus, applyDistortion) {
         currentFocus = {'x': currentFocus[0], 'y': currentFocus[1]};
         var dx = focus.x - currentFocus.x;
         var dy = focus.y - currentFocus.y;
@@ -60,7 +60,7 @@
 
         for (var i = 0; i < toDistort.size(); i++) {
           var affected = toDistort.get(i);
-          distortFunc(affected.index, affected.distortion);
+          applyDistortion(affected.index, affected.distortion);
         }
           
         focus = currentFocus;
