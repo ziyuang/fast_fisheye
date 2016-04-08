@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+  <style type="text/css">
+  	circle {
+  		fill: red;
+  		stroke: black;
+  	}
+  </style>
+  <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript" src="fast_fisheye.em.js"></script>
+  <script type="text/javascript" src="fast_fisheye.js"></script>
+</head>
+<body>
+<div id="container">
+<svg width="1500" height="900"></svg>
+</div>
+</body>
+<script type="text/javascript" src="http://www.numericjs.com/lib/numeric-1.2.6.min.js"></script>
+<script type="text/javascript">
+  var seed = 0;
+  numeric.seedrandom.seedrandom(seed);
+  Math.random = numeric.seedrandom.random;
+</script>
+
+<script type="text/javascript">
+
+function randomArray(n, min, max) {
+	return d3.range(n).map(function() {
+		return Math.random() * (max-min) + min;
+	})
+}
+
+</script>
+
+<script type="text/javascript">
+
+var minr = 1, 
+		maxr = 3;
+var n = 10000;
+
+var svg = d3.select('svg');
+var width = svg.attr('width');
+var height = svg.attr('height');
+var margin = maxr;
+var cxArray = randomArray(n, margin, width-margin);
+var cyArray = randomArray(n, margin, height-margin);
+var rArray = randomArray(n, minr, maxr);
+var circleArray = new Array(n);
+for (var i = 0; i < n; i++) {
+	circleArray[i] = {'x': cxArray[i], 'y': cyArray[i], 'r': rArray[i]};
+}
+
+var circles = svg
+	.append('g')
+	.selectAll('circle')
+	.data(circleArray)
+	.enter()
+	.append('circle')
+	.attr('cx', function(d) {return d.x})
+	.attr('cy', function(d) {return d.y})
+	.attr('r', function(d) {return d.r});
+
+var fisheye = d3.fisheye.circular()
+  .radius(200)
+  .distortion(2)
+  .prepare(circleArray);
+
+var applyDistortion = function(circleIdx, distortion) {
+	var circle = d3.select(circles[0][circleIdx]);
+	circle.attr('cx', distortion.x);
+	circle.attr('cy', distortion.y);
+	circle.attr('r', distortion.z * rArray[circleIdx]);
+};
+
+var removeDistortion = function(circleIdx) {
+	var circle = d3.select(circles[0][circleIdx]);
+	circle.attr('cx', circleArray[circleIdx].x);
+	circle.attr('cy', circleArray[circleIdx].y);
+	circle.attr('r', rArray[circleIdx])
+}
+
+svg.on("mousemove", function() {
+	fisheye.focus(d3.mouse(this));
+	fisheye(applyDistortion, removeDistortion);
+});
+
+</script>
+</html>
