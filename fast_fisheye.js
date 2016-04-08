@@ -28,9 +28,17 @@
         else {
           var distortFunc = _;
           var toDistort = fastFisheye.distort(focus);
-          for (var i = 0; i < toDistort.size(); i++) {
-            var affected = toDistort.get(i);
-            distortFunc(affected.index, affected.distortion);
+          if (async !== undefined) {
+            async.each(d3.range(toDistort.size()), function(i) {
+              var affected = toDistort.get(i);
+              distortFunc(affected.index, affected.distortion);
+            });
+          }
+          else {
+            for (var i = 0; i < toDistort.size(); i++) {
+              var affected = toDistort.get(i);
+              distortFunc(affected.index, affected.distortion);
+            }
           }
         }
       }
