@@ -1,5 +1,5 @@
 # Fast Fisheye
-A faster fisheye plugin for d3, directly combined with _k_-d tree for faster nearest neighbors search.
+A faster fisheye plugin for d3, directly combined with _k_-d tree for nearest neighbors search.
 
 ## Build
 1. Install and set up [emscripten](http://kripken.github.io/emscripten-site), to compile C++ code into JavaScript;
