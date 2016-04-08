@@ -1,5 +1,4 @@
 // based on d3-plugins/fisheye/fisheye.js
-var debug;
 (function() {
   d3.fisheye = {
     scale: function(scaleType) {
@@ -94,7 +93,6 @@ var debug;
             pointVec.push_back({'x': x(pts[i]), 'y': y(pts[i])});
           }
           fastFisheye = new Module.FastFisheye(pointVec, radius, k0, k1, leaf_max_size);
-          debug = fastFisheye;
         }
         return fisheye;
       }
