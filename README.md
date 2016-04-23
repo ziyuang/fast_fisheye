@@ -11,4 +11,4 @@ Check `fast_random_circles.html`. Cartesian Distortion is untouched and not sped
 
 ## Issues
 1. Not fast enough. I guess some NN search techniques for moving query (= current cursor position) should help. Left as future works.
-2. Particularly (and strangly) it is much slower in Firefox.
+2. Strangely much slower in Firefox.
