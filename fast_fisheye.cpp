@@ -71,17 +71,17 @@ private:
 	KDTree _tree;
 	double _radius, _k0, _k1;
 
-	FisheyeDistortion distortPoint(const Point& p, const Point& focus) {
+	FisheyeDistortion distortPoint(const Point& p, const Point& focus, double dd) {
 		FisheyeDistortion distorted;
-		double dx = p.x - focus.x;
-		double dy = p.y - focus.y;
-		double dd = std::sqrt(dx*dx+dy*dy);
+		dd = std::sqrt(dd);
 		if (!dd || dd >= _radius) {
 			distorted.x = p.x;
 			distorted.y = p.y;
 			distorted.z = dd >= _radius? 1 : 10;
 		}
 		else {
+			double dx = p.x - focus.x;
+			double dy = p.y - focus.y;
 			double k = _k0 * (1 - std::exp( - dd * _k1)) / dd * 0.75 + 0.25;
 			distorted.x = focus.x + dx * k;
 			distorted.y = focus.y + dy * k;
@@ -119,7 +119,7 @@ public:
 		for (size_t i = 0; i < nMatches; i++) {
 			FisheyeIndexDistortionPair toDistort_i;
 			toDistort_i.index = kdtreeMatches[i].first;
-			toDistort_i.distortion = distortPoint(_pointCloud.pts[toDistort_i.index], focus);
+			toDistort_i.distortion = distortPoint(_pointCloud.pts[toDistort_i.index], focus, kdtreeMatches[i].second);
 			// std::cout << "distortion: (" << toDistort_i.distortion.x << ", " << toDistort_i.distortion.y << ", " << toDistort_i.distortion.z << ")" << std::endl;
 			toDistort[i] = toDistort_i;
 		}
