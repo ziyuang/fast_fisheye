@@ -10,5 +10,5 @@ A faster fisheye plugin for d3, directly combined with _k_-d tree for nearest ne
 Check `fast_random_circles.html`. Cartesian Distortion is untouched and not sped up.
 
 ## Issues
-1. Not fast enough. I guess some NN search techniques for moving query (= current cursor position) should help. Left as future works.
+1. Not fast enough. I guess some NN search techniques for moving query (= current cursor position) should help. Leave it as future work.
 2. Strangely much slower in Firefox.
